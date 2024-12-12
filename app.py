@@ -92,7 +92,10 @@ class MindMap:
             return
 
         parent = self.current_node.parent
+        d = Node.delete().where(Node.parent_id == self.current_node.id)
+        d.execute()
         self.session.delete(self.current_node)
+
         self.session.commit()
         self.current_node = parent
         st.success(f"节点已删除。当前导航到父节点：{self.current_node.name}")
@@ -324,10 +327,9 @@ def main():
 
         st.subheader("删除当前节点")
         if st.button("🗑️ 删除"):
-            confirm = st.warning("您确认要删除当前节点吗？此操作将删除所有子节点。", icon="⚠️")
-            if st.button("确认删除"):
-                mind_map.delete_current_node()
-                st.rerun()
+            st.warning("此操作将删除所有子节点。", icon="⚠️")
+            mind_map.delete_current_node()
+            st.rerun()
 
         st.markdown('</div>', unsafe_allow_html=True)
 
