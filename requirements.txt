@@ -1,0 +1,10 @@
+streamlit
+networkx
+pyvis
+sqlalchemy
+phidata
+json_repair
+jinja2
+python-dotenv
+openai
+streamlit-breadcrumbs
