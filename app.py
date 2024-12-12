@@ -92,8 +92,10 @@ class MindMap:
             return
 
         parent = self.current_node.parent
-        d = Node.delete().where(Node.parent_id == self.current_node.id)
-        d.execute()
+        objs=self.session.query(Node).filter(Node.parent_id==self.current_node.id).all()
+        for obj in objs:
+            self.session.delete(obj)
+
         self.session.delete(self.current_node)
 
         self.session.commit()
@@ -136,7 +138,7 @@ class MindMap:
             parent_nodes=parent_node_names,
             num_subjects=num_subjects
         )
-        suggestions = call(prompt, search=False)["subjects"]
+        suggestions = call(prompt, search=False)["subjects"][:num_subjects]
         new_nodes = []
         for suggestion in suggestions:
             if suggestion and not self.session.query(Node).filter_by(name=suggestion, parent_id=self.current_node.id).first():
