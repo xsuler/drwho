@@ -86,6 +86,17 @@ class MindMap:
             self.session.commit()
         self.current_node = self.root
 
+    def delete_current_node(self):
+        if self.current_node == self.root:
+            st.warning("无法删除根节点。")
+            return
+
+        parent = self.current_node.parent
+        self.session.delete(self.current_node)
+        self.session.commit()
+        self.current_node = parent
+        st.success(f"节点已删除。当前导航到父节点：{self.current_node.name}")
+
     def get_children(self, node):
         return self.session.query(Node).filter_by(parent_id=node.id).all()
 
@@ -253,14 +264,14 @@ def main():
     # 添加横幅
     banner_html = """
     <div class="card" style="background-color:#2A2A2A; padding:10px; border-radius:5px; text-align:center;">
-        <h1 style="color:white;">互动式脑图探索平台 🧠</h1>
+        <h1 style="color:white;">MindEden 🧠</h1>
     </div>
     """
     st.markdown(banner_html, unsafe_allow_html=True)
 
     # 添加网站介绍
     introduction = """
-    ## 🌐 网站介绍
+    ## MindEden🧠
 欢迎来到**MindEden**🧠。本平台旨在帮助您通过可视化的脑图结构来组织和扩展您的思维。您可以轻松地添加、浏览和管理节点，以便更好地规划您的项目、学习路径或任何其他需要结构化思维的任务。
 
 **✨ 主要功能：**
@@ -310,6 +321,14 @@ def main():
                 else:
                     mind_map.expand_node(prompt.strip(), num_subjects=num_subjects)
                     st.rerun()
+
+        st.subheader("删除当前节点")
+        if st.button("🗑️ 删除"):
+            confirm = st.warning("您确认要删除当前节点吗？此操作将删除所有子节点。", icon="⚠️")
+            if st.button("确认删除"):
+                mind_map.delete_current_node()
+                st.rerun()
+
         st.markdown('</div>', unsafe_allow_html=True)
 
     # 显示当前路径
